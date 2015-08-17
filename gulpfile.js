@@ -17,6 +17,8 @@ var shell = require('gulp-shell');
 var karma = require('karma').server;
 var connect = require('gulp-connect');
 var gulpProtractor = require("gulp-protractor").protractor;
+var browserify = require('gulp-browserify');
+var browserSync = require('browser-sync').create();
 var bumpVersion = function(type) {
   type = type || 'patch';
   var version = '';
@@ -38,6 +40,33 @@ var bumpVersion = function(type) {
     });
 
 };
+
+gulp.task('default', ['clean','build-js'], function() {
+  runSequence('serve');
+});
+
+gulp.task('serve',  ['build-js'], function() {
+  // setup the server
+  browserSync.init({
+    server: {
+        baseDir: __dirname + '/testapp',
+    }
+  });
+  // ensure the browser reloads when files are changed
+  gulp.watch([
+      'app.js',
+      'services/*.js',
+      'directives/*.js'
+    ], ['js-watch']);
+
+});
+gulp.task('js-watch', ['build-js'], browserSync.reload);
+
+
+
+gulp.task('build', function(callback) {
+  runSequence('clean', 'build-js', 'test', 'docs', callback);
+});
 
 gulp.task('clean', function() {
   return gulp.src('build')
@@ -70,14 +99,13 @@ gulp.task('docs', shell.task([
     '-r directives services' 
 ]));
 
+
 gulp.task('bump', ['build'], function() { bumpVersion('patch'); });
 gulp.task('bump:patch', ['build'], function() { bumpVersion('patch'); });
 gulp.task('bump:minor', ['build'], function() { bumpVersion('minor'); });
 gulp.task('bump:major', ['build'], function() { bumpVersion('major'); });
 
-gulp.task('build', function(callback) {
-  runSequence('clean', 'build-js', 'test', 'docs', callback);
-});
+
 
 gulp.task('test', function (done) {
   karma.start({
@@ -92,6 +120,7 @@ gulp.task('testapp-server',  function() {
     port: 8888
   });
 });
+
 
 gulp.task('test-e2e', ['testapp-server'], function() {
   gulp.src([__dirname + "/spec/e2e/*_spec.js"])  
