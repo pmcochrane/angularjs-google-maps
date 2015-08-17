@@ -1,43 +1,32 @@
 <!doctype html>
 <html ng-app="myapp">
   <head>
-<script src="https://code.angularjs.org/1.2.25/angular.js"></script>
-<script src="../build/scripts/ng-map.min.js"></script>
-<!--
-<script src="../app.js"></script>
-<script src="../directives/map_controller.js"></script>
-<script src="../directives/map.js"></script>
-<script src="../directives/marker.js"></script>
-<script src="../directives/shape.js"></script>
-<script src="../directives/info-window.js"></script>
-<script src="../directives/map-lazy-load.js"></script>
-<script src="../services/geo_coder.js"></script>
-<script src="../services/navigator_geolocation.js"></script>
-<script src="../services/attr2_options.js"></script>
--->
-<script>
-var app = app || angular.module('myapp', ['ngMap']);
-app.controller('MyCtrl', function($scope, $timeout) {
-  $scope.stores = {
-    foo: { position:[41, -87], items: [1,2,3,4]},
-    bar:{ position:[41, -83], items: [5,6,7,8]}
-  };
-  //$scope.googleMapsUrl = 'https://maps.google.com/maps/api/js?v=3&client=XXXXXXXXenter-api-key-hereXXXX';
-  $scope.googleMapsUrl = 'https://maps.google.com/maps/api/js'; // Just use the default for testing
-  $scope.pauseLoading=true;
-  console.log("Starting a timer to wait for 5 seconds before the map will start loading");
+    <script src="https://code.angularjs.org/1.4.4/angular.js"></script>
+    <script src="../build/scripts/ng-map.js"></script>
 
-  $timeout(function() {
-    console.debug("Showing the map. The google maps api should load now.");
-    $scope.pauseLoading=false;
-  },5000);
+    <script>
+    var app = app || angular.module('myapp', ['ngMap']);
+    app.controller('MyCtrl', function($scope, $timeout) {
+      $scope.stores = {
+        foo: { position:[41, -87], items: [1,2,3,4]},
+        bar:{ position:[41, -83], items: [5,6,7,8]}
+      };
+      //$scope.googleMapsUrl = 'https://maps.google.com/maps/api/js?v=3&client=XXXXXXXXenter-api-key-hereXXXX';
+      $scope.googleMapsUrl = 'https://maps.google.com/maps/api/js'; // Just use the default for testing
+      $scope.pauseLoading=true;
+      console.log("Starting a timer to wait for 5 seconds before the map will start loading");
 
-  $scope.showStore = function(evt, id) {
-    $scope.store = $scope.stores[id];
-    $scope.showInfoWindow.apply(this, [evt, 'foo']);
-  };
-});  
-</script>
+      $timeout(function() {
+        console.debug("Showing the map. The google maps api should load now.");
+        $scope.pauseLoading=false;
+      },5000);
+
+      $scope.showStore = function(evt, id) {
+        $scope.store = $scope.stores[id];
+        $scope.showInfoWindow.apply(this, [evt, 'foo']);
+      };
+    });  
+    </script>
   </head>
   <body ng-controller="MyCtrl">
 
