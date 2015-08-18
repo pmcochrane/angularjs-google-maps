@@ -48,14 +48,15 @@
       }
 
       for (var eventName in events) {
-        eventName &&
-          google.maps.event.addListener(svp, eventName, events[eventName]);
+        if (events.hasOwnProperty(eventName)) {
+          eventName && google.maps.event.addListener(svp, eventName, events[eventName]);
+        }
       }
       return svp;
     };
 
-    var linkFunc = function(scope, element, attrs, mapController) {
-      var orgAttrs = parser.orgAttributes(element);
+    var linkFunc = function(scope, element, attrs/*, mapController*/) {
+      //var orgAttrs = parser.orgAttributes(element);
       var filtered = parser.filter(attrs);
       var options = parser.getOptions(filtered);
       var controlOptions = parser.getControlOptions(filtered);

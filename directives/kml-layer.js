@@ -32,7 +32,9 @@
     var getKmlLayer = function(options, events) {
       var kmlLayer = new google.maps.KmlLayer(options);
       for (var eventName in events) {
-        google.maps.event.addListener(kmlLayer, eventName, events[eventName]);
+        if (events.hasOwnProperty(eventName)) {
+          google.maps.event.addListener(kmlLayer, eventName, events[eventName]);
+        }
       }
       return kmlLayer;
     };
@@ -46,9 +48,10 @@
         var filtered = parser.filter(attrs);
         var options = parser.getOptions(filtered);
         var events = parser.getEvents(scope, filtered);
-        console.log('kml-layer options', kmlLayer, 'events', events);
 
         var kmlLayer = getKmlLayer(options, events);
+        console.log('kml-layer options', kmlLayer, 'events', events);
+
         mapController.addObject('kmlLayers', kmlLayer);
         mapController.observeAttrSetObj(orgAttrs, attrs, kmlLayer);  //observers
         element.bind('$destroy', function() {

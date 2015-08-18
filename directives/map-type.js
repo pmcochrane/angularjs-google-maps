@@ -17,7 +17,7 @@
   'use strict';
 
   angular.module('ngMap').directive('mapType', ['Attr2Options', '$window', function(Attr2Options, $window) {
-    var parser = Attr2Options;
+    //var parser = Attr2Options;
     
     return {
       restrict: 'E',
@@ -31,7 +31,7 @@
         if (attrs.object) {
           var __scope = scope[attrs.object] ? scope : $window;
           mapTypeObject = __scope[attrs.object];
-          if (typeof mapTypeObject == "function") {
+          if (typeof mapTypeObject === "function") {
             mapTypeObject = new mapTypeObject();
           }
         }

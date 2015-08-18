@@ -81,7 +81,7 @@
     $compile = _$compile_, $timeout = _$timeout_;
     return {
       compile: compileFunc
-    }
+    };
   };
   mapLazyLoad.$inject = ['$compile','$timeout'];
 

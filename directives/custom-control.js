@@ -28,14 +28,13 @@
 (function() {
   'use strict';
   angular.module('ngMap').directive('customControl', ['Attr2Options', '$compile', function(Attr2Options, $compile)  {
-    'use strict';
     var parser = Attr2Options;
 
     return {
       restrict: 'E',
       require: '^map',
       link: function(scope, element, attrs, mapController) {
-        var orgAttrs = parser.orgAttributes(element);
+        //var orgAttrs = parser.orgAttributes(element);
         var filtered = parser.filter(attrs);
         var options = parser.getOptions(filtered, scope);
         var events = parser.getEvents(scope, filtered);
@@ -51,7 +50,9 @@
          * set events
          */
         for (var eventName in events) {
-          google.maps.event.addDomListener(customControlEl, eventName, events[eventName]);
+          if (events.hasOwnProperty(eventName)) {
+            google.maps.event.addDomListener(customControlEl, eventName, events[eventName]);
+          }
         }
 
         mapController.addObject('customControls', customControlEl);

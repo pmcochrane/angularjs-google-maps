@@ -26,13 +26,13 @@
     } catch(e) { // if not parsable, change little
       return str
         // wrap keys without quote with valid double quote
-        .replace(/([\$\w]+)\s*:/g, function(_, $1){return '"'+$1+'":'})
+        .replace(/([\$\w]+)\s*:/g, function(_, $1){return '"'+$1+'":';})
         // replacing single quote wrapped ones to double quote 
-        .replace(/'([^']+)'/g, function(_, $1){return '"'+$1+'"'})
+        .replace(/'([^']+)'/g, function(_, $1){return '"'+$1+'"';});
     }
   }
 
-  var Attr2Options = function($parse, $timeout, NavigatorGeolocation, GeoCoder) { 
+  var Attr2Options = function($parse, $timeout/*, NavigatorGeolocation, GeoCoder*/) { 
 
     /**
      * Returns the attributes of an element as hash
@@ -51,7 +51,10 @@
     };
 
     var toOptionValue = function(input, options) {
-      var output, key=options.key, scope=options.scope;
+      var output, 
+      //scope=options.scope, 
+      key=options.key;
+      
       try { // 1. Number?
         var num = Number(input);
         if (isNaN(num)) {
@@ -67,8 +70,8 @@
           output = JSON.parse(JSONize(input));
           if (output instanceof Array) {
             var t1stEl = output[0];
-            if (t1stEl.constructor == Object) { // [{a:1}] : not lat/lng ones
-            } else if (t1stEl.constructor == Array) { // [[1,2],[3,4]] 
+            if (t1stEl.constructor === Object) { // [{a:1}] : not lat/lng ones
+            } else if (t1stEl.constructor === Array) { // [[1,2],[3,4]] 
               output =  output.map(function(el) {
                 return new google.maps.LatLng(el[0], el[1]);
               });
@@ -120,10 +123,12 @@
         void(0);
       } else {
         for (var attrName in attrs) {
-          var attrValue = attrs[attrName];
-          if (attrValue && attrValue.match(/\{\{.*\}\}/)) { // if attr value is {{..}}
-            console.log('setting attribute to observe', attrName, camelCase(attrName), attrValue);
-            attrsToObserve.push(camelCase(attrName));
+          if (attrs.hasOwnProperty(attrName)) {
+            var attrValue = attrs[attrName];
+            if (attrValue && attrValue.match(/\{\{.*\}\}/)) { // if attr value is {{..}}
+              console.log('setting attribute to observe', attrName, camelCase(attrName), attrValue);
+              attrsToObserve.push(camelCase(attrName));
+            }
           }
         }
       }
@@ -233,7 +238,7 @@
      */
     var getControlOptions = function(filtered) {
       var controlOptions = {};
-      if (typeof filtered != 'object') {
+      if (typeof filtered !== 'object') {
         return false;
       }
 

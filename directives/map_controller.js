@@ -24,7 +24,7 @@
           if (object[setMethod]) { //if set method does exist
             /* if an location is being observed */
             if (attrName.match(/center|position/) && 
-              typeof optionValue == 'string') {
+              typeof optionValue === 'string') {
               _this.getGeoLocation(optionValue).then(function(latlng) {
                 object[setMethod](latlng);
               });
@@ -56,7 +56,7 @@
         this.map[groupName] = this.map[groupName] || {};
         var len = Object.keys(this.map[groupName]).length;
         this.map[groupName][obj.id || len] = obj;
-        if (groupName != "infoWindows" && obj.setMap) { //infoWindow.setMap works like infoWindow.open
+        if (groupName !== "infoWindows" && obj.setMap) { //infoWindow.setMap works like infoWindow.open
           obj.setMap && obj.setMap(this.map);
         }
         if (obj.centered && obj.position) {
@@ -81,7 +81,9 @@
       if (obj.map) {
         var objs = obj.map[groupName];
         for (var name in objs) {
-          objs[name] === obj && (delete objs[name]);
+          if (objs.hasOwnProperty(name)) {
+            objs[name] === obj && (delete objs[name]);
+          }
         }
 
         /* delete from map */
@@ -172,7 +174,9 @@
     this.zoomToIncludeMarkers = function() {
       var bounds = new google.maps.LatLngBounds();
       for (var marker in this.map.markers) {
-        bounds.extend(this.map.markers[marker].getPosition());
+        if (this.map.markers.hasOwnProperty(marker)) {
+          bounds.extend(this.map.markers[marker].getPosition());
+        }
       }
       this.map.fitBounds(bounds);
     };

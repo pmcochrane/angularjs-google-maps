@@ -49,12 +49,14 @@
         options.icon.path =  google.maps.SymbolPath[options.icon.path];
       }
       for (var key in options.icon) {
-        var arr = options.icon[key];
-        if (key == "anchor" || key == "origin") {
-          options.icon[key] = new google.maps.Point(arr[0], arr[1]);
-        } else if (key == "size" || key == "scaledSize") {
-          options.icon[key] = new google.maps.Size(arr[0], arr[1]);
-        } 
+        if (options.icon.hasOwnProperty(key)) {
+          var arr = options.icon[key];
+          if (key === "anchor" || key === "origin") {
+            options.icon[key] = new google.maps.Point(arr[0], arr[1]);
+          } else if (key === "size" || key === "scaledSize") {
+            options.icon[key] = new google.maps.Size(arr[0], arr[1]);
+          } 
+        }
       }
     }
     if (!(options.position instanceof google.maps.LatLng)) {

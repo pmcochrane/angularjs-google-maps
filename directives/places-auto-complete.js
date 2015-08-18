@@ -29,14 +29,16 @@
       console.log('autocomplete options', options, 'events', events);
       var autocomplete = new google.maps.places.Autocomplete(element[0], options);
       for (var eventName in events) {
-        google.maps.event.addListener(autocomplete, eventName, events[eventName]);
+        if (events.hasOwnProperty(eventName)) {
+          google.maps.event.addListener(autocomplete, eventName, events[eventName]);
+        }
       }
 
       var updateModel = function() {
         $timeout(function(){
           ngModelCtrl && ngModelCtrl.$setViewValue(element.val());
         },100);
-      }
+      };
       google.maps.event.addListener(autocomplete, 'place_changed', updateModel);
       element[0].addEventListener('change', updateModel);
 

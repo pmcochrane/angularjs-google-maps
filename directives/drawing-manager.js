@@ -27,7 +27,7 @@
       require: '^map',
 
       link: function(scope, element, attrs, mapController) {
-        var orgAttrs = parser.orgAttributes(element);
+        //var orgAttrs = parser.orgAttributes(element);
         var filtered = parser.filter(attrs);
         var options = parser.getOptions(filtered);
         var controlOptions = parser.getControlOptions(filtered);
@@ -53,9 +53,10 @@
         /**
          * set events
          */
-        var events = parser.getEvents(scope, filtered);
         for (var eventName in events) {
-          google.maps.event.addListener(drawingManager, eventName, events[eventName]);
+          if (events.hasOwnProperty(eventName)) {
+            google.maps.event.addListener(drawingManager, eventName, events[eventName]);
+          }
         }
 
         mapController.addObject('mapDrawingManager', drawingManager);

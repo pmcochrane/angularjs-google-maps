@@ -70,7 +70,7 @@
        * it must have a container element with ng-non-bindable
        */
       var template = element.html().trim();
-      if (angular.element(template).length != 1) {
+      if (angular.element(template).length !== 1) {
         throw "info-window working as a template must have a container";
       }
       infoWindow.__template = template.replace(/\s?ng-non-bindable[='"]+/,"");

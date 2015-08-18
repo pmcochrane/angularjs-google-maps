@@ -24,7 +24,9 @@
       var layer = new google.maps.FusionTablesLayer(options);
 
       for (var eventName in events) {
-        google.maps.event.addListener(layer, eventName, events[eventName]);
+        if (events.hasOwnProperty(eventName)) {
+          google.maps.event.addListener(layer, eventName, events[eventName]);
+        }
       }
 
       return layer;

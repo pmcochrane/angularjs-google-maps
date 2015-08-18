@@ -17,7 +17,7 @@
   'use strict';
 
   angular.module('ngMap').directive('overlayMapType', ['Attr2Options', '$window', function(Attr2Options, $window) {
-    var parser = Attr2Options;
+    //var parser = Attr2Options;
     
     return {
       restrict: 'E',
@@ -29,7 +29,7 @@
         if (attrs.object) {
           var __scope = scope[attrs.object] ? scope : $window;
           overlayMapTypeObject = __scope[attrs.object];
-          if (typeof overlayMapTypeObject == "function") {
+          if (typeof overlayMapTypeObject === "function") {
             overlayMapTypeObject = new overlayMapTypeObject();
           }
         }
@@ -38,10 +38,10 @@
         }
 
         scope.$on('mapInitialized', function(evt, map) {
-          if (initMethod == "insertAt") {
+          if (initMethod === "insertAt") {
             var index = parseInt(attrs.index, 10);
             map.overlayMapTypes.insertAt(index, overlayMapTypeObject);
-          } else if (initMethod == "push") {
+          } else if (initMethod === "push") {
             map.overlayMapTypes.push(overlayMapTypeObject);
           }
         });

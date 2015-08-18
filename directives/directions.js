@@ -35,7 +35,9 @@
     }
     var renderer = new google.maps.DirectionsRenderer(options);
     for (var eventName in events) {
-      google.maps.event.addListener(renderer, eventName, events[eventName]);
+      if (events.hasOwnProperty(eventName)) {
+        google.maps.event.addListener(renderer, eventName, events[eventName]);
+      }
     }
     return renderer;
   };
@@ -54,13 +56,15 @@
         'provideRouteAlternatives', 'avoidHighways', 'avoidTolls', 'region'
       ];
       for(var key in request){
-        (validKeys.indexOf(key) === -1) && (delete request[key]);
+        if (request.hasOwnProperty(key)) {
+          (validKeys.indexOf(key) === -1) && (delete request[key]);
+        }
       }
 
       if (request.origin && request.destination) {
         console.log('request', request);
         directionsService.route(request, function(response, status) {
-          if (status == google.maps.DirectionsStatus.OK) {
+          if (status === google.maps.DirectionsStatus.OK) {
             $timeout(function() {
               renderer.setDirections(response);
             });
@@ -92,10 +96,10 @@
         })(attrName);
       });
 
-      scope.$on('mapInitialized', function(event, map) {
+      scope.$on('mapInitialized', function(/*event, map*/) {
         updateRoute(renderer, options);
       });
-      scope.$on('$destroy', function(event, map) {
+      scope.$on('$destroy', function(/*event, map*/) {
         mapController.deleteObject('directionsRenderers', renderer);
       });
     };
@@ -104,7 +108,7 @@
       restrict: 'E',
       require: '^map',
       link: linkFunc
-    }
+    };
   }; // var directions
   directions.$inject = ['Attr2Options', '$timeout'];
 

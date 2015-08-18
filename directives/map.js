@@ -86,7 +86,7 @@
        * if style is not given to the map element, set display and height
        */
       if (attrs.defaultStyle !== 'false') {
-        if (getStyle(element[0], 'display') != "block") {
+        if (getStyle(element[0], 'display') !== "block") {
           element.css('display', 'block');
         }
         if (getStyle(element[0], 'height').match(/^(0|auto)/)) {
@@ -130,7 +130,7 @@
             map.setCenter(latlng);
             var geoCallback = attrs.geoCallback;
             geoCallback && $parse(geoCallback)(scope);
-          }, function (error) {
+          }, function (/*error*/) {
             map.setCenter(options.geoFallbackCenter);
           });
         }
@@ -174,13 +174,19 @@
           scope.$emit('mapInitialized', map);
           if (attrs.zoomToIncludeMarkers) {
             ctrl.zoomToIncludeMarkers();
-            if (attrs.zoomToIncludeMarkers == 'auto') {
+            if (attrs.zoomToIncludeMarkers === 'auto') {
               scope.$on('objectChanged', function (evt, msg) {
-                msg[0] == 'markers' && ctrl.zoomToIncludeMarkers();
+                msg[0] === 'markers' && ctrl.zoomToIncludeMarkers();
               });
             }
           }
         });
+
+        //PMC - emit an event when the map tiles have loaded - handy to detect updates in map
+        google.maps.event.addListener(map, "tilesloaded", function() {
+          scope.$emit('mapTilesLoaded', map);  
+        });
+
       }; // function initializeMap()
 
       /**

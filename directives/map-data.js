@@ -24,7 +24,7 @@
       restrict: 'E',
       require: '^map',
 
-      link: function(scope, element, attrs, mapController) {
+      link: function(scope, element, attrs/*, mapController*/) {
         var filtered = parser.filter(attrs);
         var options = parser.getOptions(filtered);
         var events = parser.getEvents(scope, filtered, events);

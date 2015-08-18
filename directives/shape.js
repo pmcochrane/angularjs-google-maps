@@ -142,7 +142,7 @@
       var shape = getShape(shapeOptions, shapeEvents);
       mapController.addObject('shapes', shape);
 
-      if (address && shapeType == 'circle') {
+      if (address && shapeType === 'circle') {
         mapController.getGeoLocation(address).then(function(latlng) {
           shape.setCenter(latlng);
           shape.centered && shape.map.setCenter(latlng);
