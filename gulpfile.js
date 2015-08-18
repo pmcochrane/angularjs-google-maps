@@ -19,6 +19,7 @@ var connect = require('gulp-connect');
 var gulpProtractor = require("gulp-protractor").protractor;
 var browserify = require('gulp-browserify');
 var browserSync = require('browser-sync').create();
+var browserSyncReload = browserSync.reload;
 var bumpVersion = function(type) {
   type = type || 'patch';
   var version = '';
@@ -41,9 +42,7 @@ var bumpVersion = function(type) {
 
 };
 
-gulp.task('default', ['clean','build-js'], function() {
-  runSequence('serve');
-});
+gulp.task('default', ['clean','build-js','serve']);
 
 gulp.task('serve',  ['build-js'], function() {
   // setup the server
@@ -56,11 +55,16 @@ gulp.task('serve',  ['build-js'], function() {
   gulp.watch([
       'app.js',
       'services/*.js',
-      'directives/*.js'
-    ], ['js-watch']);
-
+      'directives/*.js',
+      'testapp/*.html'
+    ], function() {
+      console.log("Reloading the www page");
+      runSequence(['build-js'], function() {
+        browserSync.reload();  
+      })
+    });
 });
-gulp.task('js-watch', ['build-js'], browserSync.reload);
+
 
 
 
