@@ -362,7 +362,6 @@ angular.module('ngMap', []);
  * @description
  *  Provides [defered/promise API](https://docs.angularjs.org/api/ng/service/$q) service for navigator.geolocation methods
  */
-/* global google */
 (function() {
   'use strict';
 
@@ -1654,7 +1653,7 @@ angular.module('ngMap', []);
    * @property {Hash} markers collection of Markers initiated within `map` directive
    * @property {Hash} shapes collection of shapes initiated within `map` directive
    */
-  var MapController = function($scope, $q, NavigatorGeolocation, GeoCoder, Attr2Options) { 
+  var MapController = function($scope, $q, NavigatorGeolocation, GeoCoder, Attr2Options, $timeout) { 
     var parser = Attr2Options;
     var _this = this;
 
@@ -1815,19 +1814,31 @@ angular.module('ngMap', []);
     /**
      * include all markers
      */
+    var zoomTimeout, zoomCount=0, zoomMap;
     this.zoomToIncludeMarkers = function() {
-      var bounds = new google.maps.LatLngBounds();
-      for (var marker in this.map.markers) {
-        if (this.map.markers.hasOwnProperty(marker)) {
-          bounds.extend(this.map.markers[marker].getPosition());
-        }
-      }
-      this.map.fitBounds(bounds);
+      // cancel any previous requests to zoom as a new one will be called
+      $timeout.cancel(zoomTimeout);
+      zoomMap=this.map; // this.map appear undefined in the zoomToIncludeMarkersFunc so copying it to a variable
+      zoomCount++;
+      zoomTimeout = $timeout( this.zoomToIncludeMarkersFunc, 150);
     };
 
+    // This function is called after a delay to prevent multiple redraws within a short period of time
+    this.zoomToIncludeMarkersFunc =function() {
+      window.consolelog("MapController: zoomToIncludeMarkersFunc - attempt",zoomCount);
+      var bounds = new google.maps.LatLngBounds();
+      for (var marker in zoomMap.markers) {
+        if (zoomMap.markers.hasOwnProperty(marker)) {
+          bounds.extend(zoomMap.markers[marker].getPosition());
+        }
+      }
+      zoomMap.fitBounds(bounds);
+      $timeout.cancel(zoomTimeout);
+    };
+  
   }; // MapController
 
-  MapController.$inject = ['$scope', '$q', 'NavigatorGeolocation', 'GeoCoder', 'Attr2Options'];
+  MapController.$inject = ['$scope', '$q', 'NavigatorGeolocation', 'GeoCoder', 'Attr2Options', '$timeout'];
   angular.module('ngMap').controller('MapController', MapController);
 })();
 
@@ -1968,8 +1979,7 @@ angular.module('ngMap', []);
       var filtered = parser.filter(attrs);
       var markerOptions = parser.getOptions(filtered, scope);
       var markerEvents = parser.getEvents(scope, filtered);
-      void 0;
-
+      
       var address;
       if (!(markerOptions.position instanceof google.maps.LatLng)) {
         address = markerOptions.position;
@@ -1978,8 +1988,9 @@ angular.module('ngMap', []);
       mapController.addObject('markers', marker);
       if (address) {
         mapController.getGeoLocation(address).then(function(latlng) {
+          void 0;
           marker.setPosition(latlng);
-          markerOptions.centered && marker.map.setCenter(latlng);
+          mapController.zoomToIncludeMarkers();  //PMC: this should probably only be called when the map directive attribute is set as unwanted zooming may occur when adding a marker
           var geoCallback = attrs.geoCallback;
           geoCallback && $parse(geoCallback)(scope);
         });

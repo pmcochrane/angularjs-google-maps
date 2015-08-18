@@ -86,8 +86,7 @@
       var filtered = parser.filter(attrs);
       var markerOptions = parser.getOptions(filtered, scope);
       var markerEvents = parser.getEvents(scope, filtered);
-      console.log('marker options', markerOptions, 'events', markerEvents);
-
+      
       var address;
       if (!(markerOptions.position instanceof google.maps.LatLng)) {
         address = markerOptions.position;
@@ -96,8 +95,9 @@
       mapController.addObject('markers', marker);
       if (address) {
         mapController.getGeoLocation(address).then(function(latlng) {
+          console.log("marker.js - marker: getGeoLocation Resolved:",address,"to",latlng.toString());
           marker.setPosition(latlng);
-          markerOptions.centered && marker.map.setCenter(latlng);
+          mapController.zoomToIncludeMarkers();  //PMC: this should probably only be called when the map directive attribute is set as unwanted zooming may occur when adding a marker
           var geoCallback = attrs.geoCallback;
           geoCallback && $parse(geoCallback)(scope);
         });

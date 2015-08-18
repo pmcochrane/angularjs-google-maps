@@ -4,7 +4,6 @@
  * @description
  *  Provides [defered/promise API](https://docs.angularjs.org/api/ng/service/$q) service for navigator.geolocation methods
  */
-/* global google */
 (function() {
   'use strict';
 
