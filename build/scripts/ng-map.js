@@ -1955,6 +1955,10 @@ angular.module('ngMap', []);
     if (!(options.position instanceof google.maps.LatLng)) {
       options.position = new google.maps.LatLng(0,0);
     } 
+    if (typeof options.zIndex === "undefined" && typeof options.zIndex === "undefined" && typeof options.zindex!=="undefined") {
+      //window.consoledebug("Setting marker ",options.title," to zIndex",options.zindex);
+      options.zIndex = options.zindex;
+    }
     marker = new google.maps.Marker(options);
 
     /**
@@ -1986,6 +1990,24 @@ angular.module('ngMap', []);
       }
       var marker = getMarker(markerOptions, markerEvents);
       mapController.addObject('markers', marker);
+
+      // Create a custom label if the directive says so
+      if (typeof markerOptions.customlabel !=="undefined") {
+        marker.MarkerLabel = new MarkerLabel({
+          'map': marker.map,
+          'marker': marker,
+          'text': markerOptions.customlabel.text,
+          'color': markerOptions.customlabel.color || '#000000',
+          'fillColor': markerOptions.customlabel.fillColor || '#ffffff',
+          'fillOpacity': markerOptions.customlabel.fillOpacity || 1,
+          'strokeColor': markerOptions.customlabel.strokeColor || '#ffffff',
+          'strokeWeight': markerOptions.customlabel.strokeWeight || 1,
+          'zIndex': marker.zIndex || 'auto',
+          'backgroundColor': marker.icon.fillColor || 'transparent'
+        });
+        marker.MarkerLabel.bindTo('position', marker, 'position');
+      }
+
       if (address) {
         mapController.getGeoLocation(address).then(function(latlng) {
           void 0;
@@ -2003,6 +2025,68 @@ angular.module('ngMap', []);
       element.bind('$destroy', function() {
         mapController.deleteObject('markers', marker);
       });
+    };
+
+
+    // Marker Label Overlay
+    // This provides an ability to add a custom label to a marker
+    var MarkerLabel = function(options) {
+      var self = this;
+      this.setValues(options);
+      
+      // Create the label container
+      this.div = document.createElement('div');
+      this.div.className = 'marker-label';
+      var span = document.createElement('span');
+      span.className = "marker-icon";
+      this.div.appendChild(span);
+     
+      // Trigger the marker click handler if clicking on the label
+      google.maps.event.addDomListener(this.div, 'click', function(e){
+        (e.stopPropagation) && e.stopPropagation();
+        google.maps.event.trigger(self.marker, 'click');
+      });
+    };
+
+    // Create MarkerLabel Object
+    MarkerLabel.prototype = new google.maps.OverlayView();
+
+    // Marker Label onAdd
+    MarkerLabel.prototype.onAdd = function() {
+         /*var pane =*/ this.getPanes().overlayImage.appendChild(this.div);
+         var self = this;
+         this.listeners = [
+              google.maps.event.addListener(this, 'position_changed', function() { self.draw(); }),
+              google.maps.event.addListener(this, 'text_changed', function() { self.draw(); }),
+              google.maps.event.addListener(this, 'zindex_changed', function() { self.draw(); })
+         ];
+    };
+     
+    // Marker Label onRemove
+    MarkerLabel.prototype.onRemove = function() {
+         this.div.parentNode.removeChild(this.div);
+         for (var i = 0, I = this.listeners.length; i < I; ++i) {
+              google.maps.event.removeListener(this.listeners[i]);
+         }
+    };
+     
+    // Implement draw
+    MarkerLabel.prototype.draw = function() {
+      var projection = this.getProjection();
+      var position = projection.fromLatLngToDivPixel(this.get('position'));
+      var div = this.div;
+      div.style.left = position.x + 'px';
+      div.style.top = position.y + 'px';
+      div.style.display = 'block';
+      div.style['z-index'] = this.get('zIndex'); 
+      div.style['background-color'] = this.get('fillColor');
+      div.style.color = this.get('color');
+      div.style['border-color'] = this.get('color');
+      div.style.opacity = this.get('fillOpacity'); 
+      div.style.stroke = this.get('strokeColor'); 
+      div.style['stroke-width'] = this.get('strokeWeight');
+      this.div.innerHTML = this.get('text').toString();
+      //window.consoledebug("Markerlabel: setting label",this.text,"to z-index",div.style['z-index'], this);
     };
 
     return {

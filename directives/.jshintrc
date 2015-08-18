@@ -1,4 +1,5 @@
 {
   "predef" : [ "ngMap", "google", "MarkerCluster" ],
   "forin" : true
+  /*jshint -W030 */
 }
